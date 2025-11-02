@@ -35,7 +35,7 @@ class WebInterface(object):
 
     """
 
-    def __init__(self,ip,port,serial):
+    def __init__(self,ip,port,serial,split):
 
         self.host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
         self.app = self.Flask("SRT Notes")
@@ -55,6 +55,7 @@ class WebInterface(object):
         self.host = ip
         self.port = port
         self.serial = serial
+        self.toggle = not split
 
 
 
@@ -171,6 +172,8 @@ class WebInterface(object):
 
         ser = serial.Serial(self.serial,115200,timeout=30,parity=serial.PARITY_NONE,)
         pprint(data)
+        if self.toggle and "pwr" in data['cmd']:
+            data['cmd'] = "remote pwr\npwr on\n"
         # Send command
         ser.write( bytes(data['cmd']+"\n",'ascii',errors='ignore') )
         return "sure"
@@ -204,11 +207,11 @@ def exit_handler(sig, frame):
 
 
 
-async def startWeb(ip,port,serial):
+async def startWeb(ip,port,serial,split):
 
     # Internal Modules
     global server
-    server = WebInterface(ip,port,serial)
+    server = WebInterface(ip,port,serial,split)
 
     """ Start connections to async modules """
 
@@ -236,13 +239,14 @@ def main():
     parser.add_argument('-i', '--ip', help="Web server listening IP", default="0.0.0.0")
     parser.add_argument('-p', '--port', help="Web server listening IP", default="5002")
     parser.add_argument('-s', '--serial', help="Serial port", default="/dev/ttyUSB0")
+    parser.add_argument('-l', '--split', help="Split power button instead of toggle", action='store_true')
     parser.add_argument('other', help="", default=None, nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
 
 
     # Run web server
-    asyncio.run(startWeb(args.ip,args.port,args.serial))
+    asyncio.run(startWeb(args.ip,args.port,args.serial,args.split))
     sys.exit(0)
 
 

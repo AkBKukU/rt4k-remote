@@ -4,11 +4,14 @@ This is a very simple python script for controlling a Retrotink 4k Pro over
 serial through a web interface. It mimicks the remote entirely as an image
 allowing the user to click the buttons to send the commands.
 
-## Power Button
+## Split Power Button Option
 
-There are two commands for the power button on the RT4k to turn it on or off.
-These have been mapped to the top and bottom half of the button in the image,
-the top is ON, and the bottom is OFF.
+There are two commands for the power button on the RT4k to turn it on or off. 
+Using the `--split` option wikll map these to the top and bottom half of the 
+button in the image, the top is ON, and the bottom is OFF.
+
+Without this option both commands will be sent in an order that will behave like
+a toggle the same way the actual remote works.
 
 ## Usage
 
@@ -21,7 +24,7 @@ running.
 ## Script Help
 
 	$ ./rt4k-remote.py -h
-	usage: rt4k-remote [-h] [-i IP] [-p PORT] [-s SERIAL] ...
+	usage: rt4k-remote [-h] [-i IP] [-p PORT] [-s SERIAL] [-l] ...
 
 	Web page remote for serial control of RT4K
 
@@ -33,6 +36,7 @@ running.
 	-i, --ip IP          Web server listening IP
 	-p, --port PORT      Web server listening IP
 	-s, --serial SERIAL  Serial port
+	-l, --split          Split power button instead of toggle
 
 
 ## Installation
