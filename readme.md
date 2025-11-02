@@ -4,6 +4,12 @@ This is a very simple python script for controlling a Retrotink 4k Pro over
 serial through a web interface. It mimicks the remote entirely as an image
 allowing the user to click the buttons to send the commands.
 
+## Power Button
+
+There are two commands for the power button on the RT4k to turn it on or off.
+These have been mapped to the top and bottom half of the button in the image,
+the top is ON, and the bottom is OFF.
+
 ## Usage
 
 When launching the script you can provide a serial port for the RT4k as well as
