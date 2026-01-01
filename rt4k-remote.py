@@ -14,6 +14,17 @@ from multiprocessing import Process
 # External Modules
 try:
     import serial
+    import serial.tools.list_ports
+
+    def serialByName(name):
+
+        # Lazy wrap both
+        if "/dev/" in name:
+            return name
+
+        for port in serial.tools.list_ports.comports():
+            if port[1] == name:
+                return port[0]
 except Exception as e:
     print("Need to install Python module [pyserial]")
     sys.exit(1)
@@ -39,7 +50,11 @@ class WebInterface(object):
     def __init__(self,ip,port,serial,split):
 
         self.host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
+<<<<<<< HEAD
         self.app = self.Flask("RT4K Remote")
+=======
+        self.app = self.Flask("Retrotink 4k Remote")
+>>>>>>> 4a18cb81a321898b6aab33524c3be320722ce5aa
         self.app.logger.disabled = True
         #log = logging.getLogger('werkzeug')
         #log.disabled = True
@@ -283,6 +298,7 @@ def main():
     """ Execute as a CLI and process parameters
 
     """
+    rt4k_serial=serialByName("FT232R USB UART - FT232R USB UART")
     # Setup CLI arguments
     parser = argparse.ArgumentParser(
                     prog="rt4k-remote",
@@ -290,11 +306,17 @@ def main():
                     epilog='')
     parser.add_argument('-i', '--ip', help="Web server listening IP", default="0.0.0.0")
     parser.add_argument('-p', '--port', help="Web server listening IP", default="5002")
-    parser.add_argument('-s', '--serial', help="Serial port", default="/dev/ttyUSB0")
+    parser.add_argument('-s', '--serial', help="Serial port", default=rt4k_serial)
+    parser.add_argument('-S', '--serial-names', help="List serial port names", action='store_true')
     parser.add_argument('-l', '--split', help="Split power button instead of toggle", action='store_true')
     parser.add_argument('other', help="", default=None, nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
+    if args.serial_names:
+        for port in serial.tools.list_ports.comports():
+            if port[1] != "n/a":
+                print( port[0]+":"+port[1] )
+        sys.exit(0)
 
 
     # Run web server
