@@ -18,6 +18,7 @@ except Exception as e:
     print("Need to install Python module [pyserial]")
     sys.exit(1)
 
+
 class WebInterface(object):
     try:
         # External Modules
@@ -38,7 +39,7 @@ class WebInterface(object):
     def __init__(self,ip,port,serial,split):
 
         self.host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
-        self.app = self.Flask("SRT Notes")
+        self.app = self.Flask("RT4K Remote")
         self.app.logger.disabled = True
         #log = logging.getLogger('werkzeug')
         #log.disabled = True
@@ -57,6 +58,18 @@ class WebInterface(object):
         self.serial = serial
         self.toggle = not split
 
+    def start_direct(self):
+        """ Run Flask in a process thread that is non-blocking """
+        print("Starting Flask")
+        self.web_thread = Process(target=self.app.run,
+            kwargs={
+                "host":self.host,
+                "port":self.port,
+                "debug":False,
+                "use_reloader":False
+                }
+            )
+        self.web_thread.start()
 
 
     async def start(self):
@@ -77,9 +90,6 @@ class WebInterface(object):
         if hasattr(self, "web_thread") and self.web_thread is not None:
             self.web_thread.terminate()
             self.web_thread.join()
-        if hasattr(self, "rip_thread"):
-            self.rip_thread.terminate()
-            self.rip_thread.join()
 
 
     def index(self):
@@ -225,6 +235,48 @@ async def startWeb(ip,port,serial,split):
         asyncLoop()
     )
 
+
+try:
+    import obspython as obs
+    print("Running as OBS plugin")
+    plugin=True
+
+    def script_description():
+        return f"""<center><h2>Retrotink 4K Remote</h2></center>
+
+        <p>Create a web frontent for serial control of Retrotink 4K over USB</p>
+        """
+
+    def script_properties():
+        props = obs.obs_properties_create()
+
+        # Version header
+        obs.obs_properties_add_text(
+            props, "version_header",
+            f"<center><b>RT4K Remote</b></center>",
+            obs.OBS_TEXT_INFO
+        )
+
+    def script_defaults(settings):
+        pass
+
+    def script_update(settings):
+        pass
+
+    def script_save(settings):
+        pass
+
+    def script_load(settings):
+        global server
+        server = WebInterface("0.0.0.0","5002","/dev/ttyUSB0",False)
+        server.start_direct()
+
+    def script_unload():
+        server.stop()
+
+except Exception as e:
+    print("Running standalone")
+    plugin=False
 
 
 def main():
