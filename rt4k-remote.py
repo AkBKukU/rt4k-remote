@@ -50,11 +50,7 @@ class WebInterface(object):
     def __init__(self,ip,port,serial,split):
 
         self.host_dir=os.path.realpath(__file__).replace(os.path.basename(__file__),"")
-<<<<<<< HEAD
-        self.app = self.Flask("RT4K Remote")
-=======
         self.app = self.Flask("Retrotink 4k Remote")
->>>>>>> 4a18cb81a321898b6aab33524c3be320722ce5aa
         self.app.logger.disabled = True
         #log = logging.getLogger('werkzeug')
         #log.disabled = True
